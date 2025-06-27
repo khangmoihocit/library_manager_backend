@@ -1,5 +1,6 @@
 package khangmoihocit.library_manager.exception;
 
+import khangmoihocit.library_manager.enums.ErrorCode;
 import lombok.Getter;
 
 @Getter

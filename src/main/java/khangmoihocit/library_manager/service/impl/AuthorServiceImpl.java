@@ -3,16 +3,14 @@ package khangmoihocit.library_manager.service.impl;
 import khangmoihocit.library_manager.dto.request.AuthorRequest;
 import khangmoihocit.library_manager.dto.response.AuthorResponse;
 import khangmoihocit.library_manager.entity.Author;
-import khangmoihocit.library_manager.entity.Categories;
 import khangmoihocit.library_manager.exception.AppException;
-import khangmoihocit.library_manager.exception.ErrorCode;
+import khangmoihocit.library_manager.enums.ErrorCode;
 import khangmoihocit.library_manager.mapper.AuthorMapper;
 import khangmoihocit.library_manager.repository.AuthorRepository;
 import khangmoihocit.library_manager.service.AuthorService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
