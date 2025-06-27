@@ -10,6 +10,9 @@ public enum ErrorCode {
     BOOK_NOT_EXISTED(3001, "sách không tồn tại", HttpStatus.NOT_FOUND),
     AUTHOR_NOT_EXISTED(1001, "tác giả không tồn tại", HttpStatus.NOT_FOUND),
     INVALID_DATE_FORMAT(1002, "Lỗi dịnh dạng ngày (yyyy-mm-dd)", HttpStatus.BAD_REQUEST),
+    CATEGORY_NOT_EXISTED(2001, "thể loại sách không tồn tại", HttpStatus.NOT_FOUND),
+    CATEGORIES_EMPTY(2001, "Không có thể loại sách nào trong kho", HttpStatus.BAD_REQUEST),
+
     ;
 
 
