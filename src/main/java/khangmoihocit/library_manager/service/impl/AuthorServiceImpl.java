@@ -3,6 +3,7 @@ package khangmoihocit.library_manager.service.impl;
 import khangmoihocit.library_manager.dto.request.AuthorRequest;
 import khangmoihocit.library_manager.dto.response.AuthorResponse;
 import khangmoihocit.library_manager.entity.Author;
+import khangmoihocit.library_manager.entity.Categories;
 import khangmoihocit.library_manager.exception.AppException;
 import khangmoihocit.library_manager.exception.ErrorCode;
 import khangmoihocit.library_manager.mapper.AuthorMapper;
@@ -56,6 +57,8 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public void deleteById(Long id) {
+        Author author = authorRepository.findById(id)
+                        .orElseThrow(()-> new AppException(ErrorCode.AUTHOR_NOT_EXISTED));
         authorRepository.deleteById(id);
     }
 }
