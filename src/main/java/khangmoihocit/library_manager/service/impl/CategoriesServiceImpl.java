@@ -4,7 +4,7 @@ import khangmoihocit.library_manager.dto.request.CategoriesRequest;
 import khangmoihocit.library_manager.dto.response.CategoriesResponse;
 import khangmoihocit.library_manager.entity.Categories;
 import khangmoihocit.library_manager.exception.AppException;
-import khangmoihocit.library_manager.exception.ErrorCode;
+import khangmoihocit.library_manager.enums.ErrorCode;
 import khangmoihocit.library_manager.mapper.CategoriesMapper;
 import khangmoihocit.library_manager.repository.CategoriesRepository;
 import khangmoihocit.library_manager.service.CategoriesService;

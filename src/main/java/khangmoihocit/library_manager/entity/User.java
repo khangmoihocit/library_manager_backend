@@ -3,8 +3,8 @@ package khangmoihocit.library_manager.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,7 +34,8 @@ public class User {
     @Column(name = "full_name")
     String fullName;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
 
     @ManyToMany(fetch = FetchType.EAGER)
