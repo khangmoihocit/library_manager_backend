@@ -19,42 +19,42 @@ public class CategoriesController {
     CategoriesService categoriesService;
 
     @PostMapping("/add-new")
-    public ApiResponse<CategoriesResponse> addNewCategory(@RequestBody CategoriesRequest request){
+    ApiResponse<CategoriesResponse> addNewCategory(@RequestBody CategoriesRequest request) {
         return ApiResponse.<CategoriesResponse>builder()
                 .result(categoriesService.addNewCategory(request))
                 .build();
     }
 
     @PutMapping("/update/{id}")
-    public ApiResponse<CategoriesResponse> updateCategory(@PathVariable Long id, @RequestBody CategoriesRequest request) {
+    ApiResponse<CategoriesResponse> updateCategory(@PathVariable Long id, @RequestBody CategoriesRequest request) {
         return ApiResponse.<CategoriesResponse>builder()
                 .result(categoriesService.updateCategory(id, request))
                 .build();
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<CategoriesResponse> getCategory(@PathVariable Long id) {
+    ApiResponse<CategoriesResponse> getCategory(@PathVariable Long id) {
         return ApiResponse.<CategoriesResponse>builder()
                 .result(categoriesService.getCategory(id))
                 .build();
     }
 
     @GetMapping("/get-all")
-    public ApiResponse<List<CategoriesResponse>> getCategories() {
+    ApiResponse<List<CategoriesResponse>> getCategories() {
         return ApiResponse.<List<CategoriesResponse>>builder()
                 .result(categoriesService.getCategories())
                 .build();
     }
 
     @GetMapping("/find-all-by-name/{name}")
-    public ApiResponse<List<CategoriesResponse>> getCategories(@PathVariable String name) {
+    ApiResponse<List<CategoriesResponse>> getCategories(@PathVariable String name) {
         return ApiResponse.<List<CategoriesResponse>>builder()
                 .result(categoriesService.findAllByName(name))
                 .build();
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
+    ApiResponse<Void> delete(@PathVariable Long id) {
         categoriesService.deleteById(id);
         return ApiResponse.<Void>builder()
                 .message("thể loại sách đã được xóa")

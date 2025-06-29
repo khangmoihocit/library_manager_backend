@@ -55,7 +55,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse updateUser(Long id, UserRequest request) {
-        return null;
+        User user = userRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+        userMapper.updateUser(user, request);
+        user = userRepository.save(user);
+        return userMapper.toUserResponse(user);
     }
 
     @Override
@@ -75,6 +78,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-
+        User user = userRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+        userRepository.deleteById(id);
     }
 }
