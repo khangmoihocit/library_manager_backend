@@ -17,39 +17,38 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthorController {
-    @Autowired
     AuthorService authorService;
 
     @PostMapping("/add-new")
-    public ApiResponse<AuthorResponse> addNewAuthor(@RequestBody AuthorRequest request) {
+    ApiResponse<AuthorResponse> addNewAuthor(@RequestBody AuthorRequest request) {
         return ApiResponse.<AuthorResponse>builder()
                 .result(authorService.addNewAuthor(request))
                 .build();
     }
 
     @PutMapping("/update/{id}")
-    public ApiResponse<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody AuthorRequest request) {
+    ApiResponse<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody AuthorRequest request) {
         return ApiResponse.<AuthorResponse>builder()
                 .result(authorService.updateAuthor(id, request))
                 .build();
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<AuthorResponse> getAuthor(@PathVariable Long id) {
+    ApiResponse<AuthorResponse> getAuthor(@PathVariable Long id) {
         return ApiResponse.<AuthorResponse>builder()
                 .result(authorService.getAuthor(id))
                 .build();
     }
 
     @GetMapping("/get-all")
-    public ApiResponse<List<AuthorResponse>> getAllAuthors() {
+    ApiResponse<List<AuthorResponse>> getAllAuthors() {
         return ApiResponse.<List<AuthorResponse>>builder()
                 .result(authorService.getAuthors())
                 .build();
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
+    ApiResponse<Void> delete(@PathVariable Long id) {
         authorService.deleteById(id);
         return ApiResponse.<Void>builder()
                 .message("tác giả đã được xóa")

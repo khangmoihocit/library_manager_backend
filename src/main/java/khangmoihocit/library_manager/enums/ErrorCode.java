@@ -9,7 +9,9 @@ public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     USERNAME_EXISTED(1001, "user name đã tồn tại", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1002, "email đã tồn tại", HttpStatus.BAD_REQUEST),
-    USER_NOT_EXISTED(1003, "user không tồn tại", HttpStatus.BAD_REQUEST),
+    USER_NOT_EXISTED(1003, "user không tồn tại", HttpStatus.NOT_FOUND),
+    UNAUTHENTICATED(1004, "unauthenticated", HttpStatus.UNAUTHORIZED), // 401 chưa xác thực
+    UNAUTHORIZED(1005, "you do not have permission", HttpStatus.FORBIDDEN), //403 không có quyền
 
     AUTHOR_NOT_EXISTED(2001, "tác giả không tồn tại", HttpStatus.NOT_FOUND),
     INVALID_DATE_FORMAT(2002, "Lỗi dịnh dạng ngày (yyyy-mm-dd)", HttpStatus.BAD_REQUEST),
