@@ -1,13 +1,13 @@
-package khangmoihocit.library_manager;
+package com.khangmoihocit.learn;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class LibraryManagerApplication {
+public class LearnApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(LibraryManagerApplication.class, args);
+		SpringApplication.run(LearnApplication.class, args);
 	}
 
 }
