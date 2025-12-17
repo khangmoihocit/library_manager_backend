@@ -12,4 +12,6 @@ public class UserServiceImpl extends BaseService implements UserService {
     public LoginResponse login(LoginRequest loginRequest) {
         return null;
     }
+
+
 }
