@@ -1,6 +1,7 @@
 package com.khangmoihocit.learn.databases.seeder;
 
 import com.khangmoihocit.learn.modules.users.entities.User;
+import com.khangmoihocit.learn.modules.users.repositories.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,18 +21,22 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Transactional
     @Override
     public void run(String... args) throws Exception {
         if(isTableEmpty()){
             String passwordEncode = passwordEncoder.encode("password");
-            entityManager.createNativeQuery("insert into users(user_catalogue_id, name, email, password, phone) values (?, ?, ?, ?, ?)")
-                    .setParameter(1, 1)
-                    .setParameter(3, "khang567.ht@gmail.com")
-                    .setParameter(2, "Pham Van Khang")
-                    .setParameter(4, passwordEncode)
-                    .setParameter(5, "09876652")
-                    .executeUpdate();
+            User user = User.builder()
+                    .user_catalogue_id(Long.valueOf(1))
+                    .name("Pham Van Khang")
+                    .email("khang567.ht@gmail.com")
+                    .password(passwordEncode)
+                    .phone("0987654321")
+                    .build();
+            userRepository.save(user);
         }
     }
 

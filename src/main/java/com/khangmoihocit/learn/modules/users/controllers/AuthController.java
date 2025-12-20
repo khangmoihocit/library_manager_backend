@@ -1,7 +1,7 @@
 package com.khangmoihocit.learn.modules.users.controllers;
 
-import com.khangmoihocit.learn.modules.users.dtos.LoginRequest;
-import com.khangmoihocit.learn.modules.users.dtos.LoginResponse;
+import com.khangmoihocit.learn.modules.users.requests.LoginRequest;
+import com.khangmoihocit.learn.modules.users.resources.LoginResource;
 import com.khangmoihocit.learn.modules.users.services.interfaces.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     UserService userService;
 
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        LoginResponse auth = userService.login(loginRequest);
+    public ResponseEntity<LoginResource> login(@RequestBody LoginRequest loginRequest) {
+        LoginResource auth = userService.login(loginRequest);
         return ResponseEntity.ok(auth);
     }
 }

@@ -1,9 +1,8 @@
 package com.khangmoihocit.learn.modules.users.services.interfaces;
 
-import com.khangmoihocit.learn.modules.users.dtos.LoginRequest;
-import com.khangmoihocit.learn.modules.users.dtos.LoginResponse;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.khangmoihocit.learn.modules.users.requests.LoginRequest;
+import com.khangmoihocit.learn.modules.users.resources.LoginResource;
 
 public interface UserService {
-    LoginResponse login(LoginRequest loginRequest);
+    LoginResource login(LoginRequest loginRequest);
 }
