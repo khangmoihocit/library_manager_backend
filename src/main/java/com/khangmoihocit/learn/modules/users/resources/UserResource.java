@@ -1,4 +1,4 @@
-package com.khangmoihocit.learn.modules.users.dtos;
+package com.khangmoihocit.learn.modules.users.resources;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LoginRequest {
-    String username;
-    String password;
+public class UserResource {
+    Long id;
+    String email;
 }
