@@ -6,8 +6,9 @@ import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findByNameContainingAndEmail(String name, String email);
+    Optional<User> findByEmail(String email);
 }
