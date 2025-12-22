@@ -82,6 +82,12 @@
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.12.6</version>
+        </dependency>
+
 <!--        auto restart    -->
 <!--		<dependency>-->
 <!--			<groupId>org.springframework.boot</groupId>-->
