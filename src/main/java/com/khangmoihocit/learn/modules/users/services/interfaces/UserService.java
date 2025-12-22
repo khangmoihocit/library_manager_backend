@@ -4,5 +4,5 @@ import com.khangmoihocit.learn.modules.users.requests.LoginRequest;
 import com.khangmoihocit.learn.modules.users.resources.LoginResource;
 
 public interface UserService {
-    LoginResource login(LoginRequest loginRequest);
+    Object authenticate(LoginRequest loginRequest);
 }

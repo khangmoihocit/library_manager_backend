@@ -11,4 +11,5 @@ import lombok.experimental.FieldDefaults;
 public class UserResource {
     Long id;
     String email;
+    String name;
 }
