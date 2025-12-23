@@ -22,15 +22,12 @@ public class SecurityConfig {
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(10);}
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         //1. Routers auth - no jwt
-                        .requestMatchers("api/v1/user/my-profile").permitAll()
+                        .requestMatchers("/api/v1/user/my-profile").permitAll()
 
                         //2. Routers PUBLIC
                         .requestMatchers("/api/v1/products").permitAll()
@@ -44,5 +41,8 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(10);}
 }
 
