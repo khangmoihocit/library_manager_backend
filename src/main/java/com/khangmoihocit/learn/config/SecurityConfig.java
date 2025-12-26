@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,10 +28,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         //1. Routers auth - no jwt
-                        .requestMatchers("/api/v1/user/my-profile").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/my-profile").permitAll()
 
                         //2. Routers PUBLIC
-                        .requestMatchers("/api/v1/products").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
 
                         .anyRequest().authenticated()
                 )
