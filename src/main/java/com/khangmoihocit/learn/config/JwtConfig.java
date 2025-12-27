@@ -15,4 +15,8 @@ public class JwtConfig {
     @Value("${jwt.expiration}")
     private long expirationTime;
 
+    @Getter
+    @Value("${jwt.issuer}")
+    private String issuer;
+
 }
