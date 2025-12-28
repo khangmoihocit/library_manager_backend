@@ -2,9 +2,11 @@ package com.khangmoihocit.learn.services;
 
 import com.khangmoihocit.learn.config.JwtConfig;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -114,14 +116,20 @@ public class JwtService {
         try{
             Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token);
             return true;
-        } catch (Exception e) {
+        } catch (SignatureException e) {
             return false;
         }
     }
 
-    public boolean isTokenExpired(String token){
-        final Date expiration = extractClaims(token, Claims::getExpiration);
-        return expiration.before(new Date());
+    public boolean isTokenExpired(String token) {
+        try {
+            final Date expiration = extractClaims(token, Claims::getExpiration);
+            return expiration.before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     public boolean isIssuerToken(String token){

@@ -38,7 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     JwtService jwtService;
     UserDetailsServiceImpl userDetailsService;
 
-
 //    @Override
 //    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 //        String path = String.valueOf(request.getRequestURL());
@@ -58,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        try{
+        try {
             jwt = authHeader.substring(7);
             if (!jwtService.isTokenFormatValid(jwt)) {
                 sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
@@ -81,7 +80,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            if (!jwtService.isTokenExpired(jwt)) {
+            if (jwtService.isTokenExpired(jwt)) {
                 sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
                         "Xác thực không thành công",
                         "token đã hết hạn");
@@ -99,26 +98,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
                 final String emailFromToken = jwtService.getEmailFromJwt(jwt);
-                if(!emailFromToken.equals(userDetails.getUsername())){
+                if (!emailFromToken.equals(userDetails.getUsername())) {
                     sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
                             "Xác thực không thành công",
                             "User token không chính xác");
                     return;
                 }
 
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-//            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//
-//            //luu vao security context de sau nay lay ra xu ly
-//            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                //luu vao security context de sau nay lay ra xu ly
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                log.info("Xác thực tài khoản thành công: " + userDetails.getUsername());
+
             }
-
             filterChain.doFilter(request, response);
-        }catch (Exception ex){
+        } catch (ServletException | IOException ex) {
             sendErrorResponse(response, request,
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Xác thực không thành công",
+                    "Network Error!",
                     ex.getMessage());
         }
     }
