@@ -38,6 +38,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     JwtService jwtService;
     UserDetailsServiceImpl userDetailsService;
 
+
+//    @Override
+//    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+//        String path = String.valueOf(request.getRequestURL());
+//
+//        return path.startsWith("/api/v1/auth");
+//    }
+
     //xac thuc token
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -55,13 +63,48 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (!jwtService.isTokenFormatValid(jwt)) {
                 sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
                         "Xác thực không thành công",
-                        "không tìm thấy token");
+                        "token không đúng định dạng");
+                return;
+            }
+
+            if (!jwtService.isSignatureValid(jwt)) {
+                sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
+                        "Xác thực không thành công",
+                        "chữ ký token không hợp lệ");
+                return;
+            }
+
+            if (!jwtService.isIssuerToken(jwt)) {
+                sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
+                        "Xác thực không thành công",
+                        "token có nguồn gốc không hợp lệ");
+                return;
+            }
+
+            if (!jwtService.isTokenExpired(jwt)) {
+                sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
+                        "Xác thực không thành công",
+                        "token đã hết hạn");
+                return;
+            }
+
+            if (!jwtService.isTokenFormatValid(jwt)) {
+                sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
+                        "Xác thực không thành công",
+                        "token không đúng định dạng");
+                return;
             }
             userId = jwtService.extractUsername(jwt); //validate token
 
             if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
-
+                final String emailFromToken = jwtService.getEmailFromJwt(jwt);
+                if(!emailFromToken.equals(userDetails.getUsername())){
+                    sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
+                            "Xác thực không thành công",
+                            "User token không chính xác");
+                    return;
+                }
 
 
 //            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

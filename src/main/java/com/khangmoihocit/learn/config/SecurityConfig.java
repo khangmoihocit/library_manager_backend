@@ -22,11 +22,12 @@ public class SecurityConfig {
 
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    //kiem tra token xong toi kiem tra pulic request
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+
+                //không có token hoặc token hợp lệ sẽ đều chạy tiếp vào đây - KIỂM TRA reqest đó có quyền không sử dụng không
                 .authorizeHttpRequests(auth -> auth
                         //1. Routers auth - no jwt
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/my-profile").permitAll()
