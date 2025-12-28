@@ -98,10 +98,10 @@ public class JwtService {
             return false;
         }
 
-        return false;
+        return true;
     }
 
-    private boolean isTokenFormatValid(String token){
+    public boolean isTokenFormatValid(String token){
         try{
             String[] tokenParts = token.split("\\.");
             return tokenParts.length == 3;
@@ -110,7 +110,7 @@ public class JwtService {
         }
     }
 
-    private boolean isSignatureValid(String token){
+    public boolean isSignatureValid(String token){
         try{
             Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token);
             return true;
@@ -119,18 +119,18 @@ public class JwtService {
         }
     }
 
-    private boolean isTokenExpired(String token){
+    public boolean isTokenExpired(String token){
         final Date expiration = extractClaims(token, Claims::getExpiration);
         return expiration.before(new Date());
     }
 
-    private boolean isIssuerToken(String token){
+    public boolean isIssuerToken(String token){
         String tokenIssuer = extractClaims(token, Claims::getIssuer);
         return tokenIssuer.equals(jwtConfig.getIssuer());
     }
 
     // Lấy theo nhiều claim khác nhau
-    public <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
+    private <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }

@@ -1,15 +1,20 @@
 package com.khangmoihocit.learn.helpers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.khangmoihocit.learn.modules.users.services.impl.UserDetailsServiceImpl;
 import com.khangmoihocit.learn.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.internal.util.StringHelper;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +25,10 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.awt.*;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -30,31 +38,66 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     JwtService jwtService;
     UserDetailsServiceImpl userDetailsService;
 
-
+    //xac thuc token
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwt; //token string
         final String userId;
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.error("test");
-
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response); //tiếp tục check ở filter chain
             return;
         }
 
-        jwt = authHeader.substring(7);
-        userId = jwtService.extractUsername(jwt); //validate token
+        try{
+            jwt = authHeader.substring(7);
+            if (!jwtService.isTokenFormatValid(jwt)) {
+                sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
+                        "Xác thực không thành công",
+                        "không tìm thấy token");
+            }
+            userId = jwtService.extractUsername(jwt); //validate token
 
-        if(userId != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+            if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+//            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//
+//            //luu vao security context de sau nay lay ra xu ly
+//            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+
+            filterChain.doFilter(request, response);
+        }catch (Exception ex){
+            sendErrorResponse(response, request,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Xác thực không thành công",
+                    ex.getMessage());
         }
+    }
 
-        filterChain.doFilter(request, response);
+    private void sendErrorResponse(
+            @NotNull HttpServletResponse response,
+            @NotNull HttpServletRequest request,
+            int statusCode, String error, String message) throws IOException {
+
+        response.setStatus(statusCode);
+        response.setContentType("application/json;charset=UTF-8");
+
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("Timestamp", System.currentTimeMillis());
+        errorResponse.put("status", statusCode);
+        errorResponse.put("error", error);
+        errorResponse.put("message", message);
+        errorResponse.put("path", request.getRequestURL());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResponse = objectMapper.writeValueAsString(errorResponse);
+
+        response.getWriter().write(jsonResponse);
     }
 }

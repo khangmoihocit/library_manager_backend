@@ -22,6 +22,7 @@ public class SecurityConfig {
 
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    //kiem tra token xong toi kiem tra pulic request
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -37,6 +38,7 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                //chạy filter này trước sau đó mới xét permiall ở trên hay không
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         ;
 
