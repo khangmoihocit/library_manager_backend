@@ -1,8 +1,11 @@
 package com.khangmoihocit.learn.modules.users.controllers;
 
 import com.khangmoihocit.learn.Resources.ErrorResource;
+import com.khangmoihocit.learn.Resources.MessageResource;
+import com.khangmoihocit.learn.modules.users.requests.BlacklistTokenRequest;
 import com.khangmoihocit.learn.modules.users.requests.LoginRequest;
 import com.khangmoihocit.learn.modules.users.resources.LoginResource;
+import com.khangmoihocit.learn.modules.users.services.interfaces.BlacklistedTokenService;
 import com.khangmoihocit.learn.modules.users.services.interfaces.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+
 @RestController
 @RequestMapping("${api.prefix}/auth")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -23,10 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class AuthController {
     UserService userService;
+    BlacklistedTokenService blacklistedTokenService;
 
-    @PostMapping
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
-        Object result = userService.authenticate(loginRequest);
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        Object result = userService.authenticate(request);
 
         if(result instanceof LoginResource loginResource){
             return ResponseEntity.ok(loginResource);
@@ -37,5 +43,15 @@ public class AuthController {
         }
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Network error");
+    }
+
+    @PostMapping("/blacklist-token")
+    public ResponseEntity<?> addTokenToBlacklist(@Valid @RequestBody BlacklistTokenRequest request) {
+        try{
+            blacklistedTokenService.create(request);
+
+        }catch (Exception ex){
+                return ResponseEntity.internalServerError().body(new MessageResource("Network Error!"));
+        }
     }
 }
