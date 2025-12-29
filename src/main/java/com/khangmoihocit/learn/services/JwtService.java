@@ -1,11 +1,13 @@
 package com.khangmoihocit.learn.services;
 
 import com.khangmoihocit.learn.config.JwtConfig;
+import com.khangmoihocit.learn.modules.users.repositories.BlacklistedTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.PrivateJwk;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import java.util.function.Function;
 public class JwtService {
 
     private final JwtConfig jwtConfig;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
 
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
@@ -103,6 +106,10 @@ public class JwtService {
         return true;
     }
 
+    public boolean isBlacklistedToken(String token){
+        return blacklistedTokenRepository.existsByToken(token);
+    }
+
     public boolean isTokenFormatValid(String token){
         try{
             String[] tokenParts = token.split("\\.");
@@ -138,13 +145,13 @@ public class JwtService {
     }
 
     // Lấy theo nhiều claim khác nhau
-    private <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
+    public <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
     // Giải mã token và lấy tất cả claims
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSignInKey())
                 .build()

@@ -26,7 +26,7 @@ public class BlacklistedToken {
     String token;
 
     @Column(name = "expiry_date", nullable = false)
-    LocalDateTime expiry_date;
+    LocalDateTime expiryDate;
     @Column(name = "create_at")
     LocalDateTime createAt;
     @Column(name = "update_at")

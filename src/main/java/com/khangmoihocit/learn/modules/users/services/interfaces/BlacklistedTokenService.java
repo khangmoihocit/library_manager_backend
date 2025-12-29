@@ -5,5 +5,5 @@ import com.khangmoihocit.learn.modules.users.requests.BlacklistTokenRequest;
 import java.util.Date;
 
 public interface BlacklistedTokenService {
-    void create(BlacklistTokenRequest request);
+    Object create(BlacklistTokenRequest request);
 }

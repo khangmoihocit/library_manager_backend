@@ -51,12 +51,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwt; //token string
         final String userId;
+
+        //nếu request không có token
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.error("test");
+            log.error("Không có token");
             filterChain.doFilter(request, response); //tiếp tục check ở filter chain
             return;
         }
 
+        //nếu request có token -> kiểm tra token có hợp lệ không,
+        //nếu hợp lệ trích xuất thông tin từ token rồi extract sang userdetail rồi lưu vào security context
         try {
             jwt = authHeader.substring(7);
             if (!jwtService.isTokenFormatValid(jwt)) {
@@ -93,6 +97,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         "token không đúng định dạng");
                 return;
             }
+
+            if(jwtService.isBlacklistedToken(jwt)){
+                sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
+                        "Xác thực không thành công",
+                        "token bị khóa.");
+                return;
+            }
             userId = jwtService.extractUsername(jwt); //validate token
 
             if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -111,7 +122,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 //luu vao security context de sau nay lay ra xu ly
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                log.info("Xác thực tài khoản thành công: " + userDetails.getUsername());
+                log.info("Xác thực tài khoản thành công (token hợp lệ): " + userDetails.getUsername());
 
             }
             filterChain.doFilter(request, response);

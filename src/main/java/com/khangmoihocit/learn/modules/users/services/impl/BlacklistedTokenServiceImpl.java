@@ -1,10 +1,13 @@
 package com.khangmoihocit.learn.modules.users.services.impl;
 
 import com.khangmoihocit.learn.Resources.ErrorResource;
+import com.khangmoihocit.learn.Resources.MessageResource;
 import com.khangmoihocit.learn.modules.users.entities.BlacklistedToken;
 import com.khangmoihocit.learn.modules.users.repositories.BlacklistedTokenRepository;
 import com.khangmoihocit.learn.modules.users.requests.BlacklistTokenRequest;
 import com.khangmoihocit.learn.modules.users.services.interfaces.BlacklistedTokenService;
+import com.khangmoihocit.learn.services.JwtService;
+import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,20 +25,30 @@ import java.util.Map;
 @Slf4j(topic = "BLACKLIST TOKEN")
 public class BlacklistedTokenServiceImpl implements BlacklistedTokenService {
     BlacklistedTokenRepository blacklistedTokenRepository;
+    JwtService jwtService;
 
     @Override
-    public void create(BlacklistTokenRequest request){
+    public Object create(BlacklistTokenRequest request){
         try{
             if(blacklistedTokenRepository.existsByToken(request.getToken())){
-                Map<String, String> errors = new HashMap<>();
-                errors.put("message", "token này đã có trong blacklist");
-                ErrorResource errorResource = ErrorResource.builder()
-                        .message("có vấn đề xẩy ra trong quá trình xác thực")
-                        .errors(errors)
-                        .build();
+                return new MessageResource("Token đã tồn tại trong blacklist");
             }
-        }catch (Exception ex){
 
+            Claims claims = jwtService.extractAllClaims(request.getToken());
+            Long userId = Long.valueOf(claims.getSubject());
+            Date expiryDate = claims.getExpiration();
+
+            BlacklistedToken blacklistedToken = BlacklistedToken.builder()
+                    .token(request.getToken())
+                    .userId(userId)
+                    .expiryDate(expiryDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                    .build();
+
+            blacklistedTokenRepository.save(blacklistedToken);
+            log.info("Thêm token vào blacklist thành công.");
+            return new MessageResource("Thêm token vào blacklist thành công.");
+        }catch (Exception ex){
+            return new MessageResource("Network Error! " + ex.getMessage());
         }
     }
 }
