@@ -1,10 +1,14 @@
 package com.khangmoihocit.learn.services;
 
 import com.khangmoihocit.learn.config.JwtConfig;
+import com.khangmoihocit.learn.modules.users.repositories.BlacklistedTokenRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.PrivateJwk;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +24,7 @@ import java.util.function.Function;
 public class JwtService {
 
     private final JwtConfig jwtConfig;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
 
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
@@ -98,10 +103,14 @@ public class JwtService {
             return false;
         }
 
-        return false;
+        return true;
     }
 
-    private boolean isTokenFormatValid(String token){
+    public boolean isBlacklistedToken(String token){
+        return blacklistedTokenRepository.existsByToken(token);
+    }
+
+    public boolean isTokenFormatValid(String token){
         try{
             String[] tokenParts = token.split("\\.");
             return tokenParts.length == 3;
@@ -110,21 +119,27 @@ public class JwtService {
         }
     }
 
-    private boolean isSignatureValid(String token){
+    public boolean isSignatureValid(String token){
         try{
             Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token);
             return true;
-        } catch (Exception e) {
+        } catch (SignatureException e) {
             return false;
         }
     }
 
-    private boolean isTokenExpired(String token){
-        final Date expiration = extractClaims(token, Claims::getExpiration);
-        return expiration.before(new Date());
+    public boolean isTokenExpired(String token) {
+        try {
+            final Date expiration = extractClaims(token, Claims::getExpiration);
+            return expiration.before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        } catch (Exception e) {
+            return true;
+        }
     }
 
-    private boolean isIssuerToken(String token){
+    public boolean isIssuerToken(String token){
         String tokenIssuer = extractClaims(token, Claims::getIssuer);
         return tokenIssuer.equals(jwtConfig.getIssuer());
     }
@@ -136,7 +151,7 @@ public class JwtService {
     }
 
     // Giải mã token và lấy tất cả claims
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSignInKey())
                 .build()

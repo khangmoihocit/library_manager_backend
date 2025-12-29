@@ -16,6 +16,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    //bắt lỗi từ @Valid
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<Object> handleValidException(MethodArgumentNotValidException exception){
         Map<String, String> errors = new HashMap<>();

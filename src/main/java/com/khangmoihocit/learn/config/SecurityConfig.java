@@ -26,17 +26,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+
+                //không có token hoặc token hợp lệ sẽ đều chạy tiếp vào đây - KIỂM TRA request đó có quyền không sử dụng không
                 .authorizeHttpRequests(auth -> auth
                         //1. Routers auth - no jwt
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users/my-profile").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/api/v1/users/my-profile").permitAll()
 
                         //2. Routers PUBLIC
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
 
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                //chạy filter này trước sau đó mới xét permiall ở trên hay không
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         ;
 

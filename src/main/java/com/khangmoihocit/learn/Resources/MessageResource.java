@@ -1,16 +1,13 @@
 package com.khangmoihocit.learn.Resources;
 
-import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Data
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SuccessResource<T> {
+@NoArgsConstructor
+@AllArgsConstructor
+public class MessageResource {
     String message;
-    T data;
-
 }
