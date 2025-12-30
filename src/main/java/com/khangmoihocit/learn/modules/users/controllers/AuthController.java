@@ -67,4 +67,9 @@ public class AuthController {
             return ResponseEntity.internalServerError().body(new MessageResource("Network Error!"));
         }
     }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(){
+        return null;
+    }
 }

@@ -63,48 +63,48 @@ public class JwtService {
     6. kiểm tra quyền
     */
 
-    public boolean isValidToken(String token, UserDetails userDetails){
-        try{
-            //1. kiem tra dinh dang
-            if(!isTokenFormatValid(token)){
-                log.error("token k dung dinh dang");
-                return false;
-            }
-
-            //2. kiem tra chu ky token
-            if(!isSignatureValid(token)){
-                log.error("chu ky khogn hop le");
-                return false;
-            }
-
-            //3. token het han chua
-            if(!isTokenExpired(token)){
-                log.error("token het han");
-                return false;
-            }
-
-            //4. kiem tra nguon goc cua token
-            if(!isIssuerToken(token)){
-                log.error("nguon goc token khong hop le");
-                return false;
-            }
-
-            //5. ktra xem userid trong token co khop voi userdetail khong
-            final String email = getEmailFromJwt(token);
-            if(!email.equals(userDetails.getUsername())){
-                log.error("user token khong hop le");
-                return false;
-            }
-
-            //6. ktra token co trong blacklist khong
-
-        }catch (Exception e){
-            log.error("xac thuc token that bai: " + e.getMessage());
-            return false;
-        }
-
-        return true;
-    }
+//    public boolean isValidToken(String token, UserDetails userDetails){
+//        try{
+//            //1. kiem tra dinh dang
+//            if(!isTokenFormatValid(token)){
+//                log.error("token k dung dinh dang");
+//                return false;
+//            }
+//
+//            //2. kiem tra chu ky token
+//            if(!isSignatureValid(token)){
+//                log.error("chu ky khogn hop le");
+//                return false;
+//            }
+//
+//            //3. token het han chua
+//            if(!isTokenExpired(token)){
+//                log.error("token het han");
+//                return false;
+//            }
+//
+//            //4. kiem tra nguon goc cua token
+//            if(!isIssuerToken(token)){
+//                log.error("nguon goc token khong hop le");
+//                return false;
+//            }
+//
+//            //5. ktra xem userid trong token co khop voi userdetail khong
+//            final String email = getEmailFromJwt(token);
+//            if(!email.equals(userDetails.getUsername())){
+//                log.error("user token khong hop le");
+//                return false;
+//            }
+//
+//            //6. ktra token co trong blacklist khong
+//
+//        }catch (Exception e){
+//            log.error("xac thuc token that bai: " + e.getMessage());
+//            return false;
+//        }
+//
+//        return true;
+//    }
 
     public boolean isBlacklistedToken(String token){
         return blacklistedTokenRepository.existsByToken(token);
