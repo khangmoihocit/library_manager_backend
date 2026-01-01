@@ -2,9 +2,12 @@ package com.khangmoihocit.learn.modules.users.controllers;
 
 import com.khangmoihocit.learn.Resources.ErrorResource;
 import com.khangmoihocit.learn.Resources.MessageResource;
+import com.khangmoihocit.learn.modules.users.entities.RefreshToken;
 import com.khangmoihocit.learn.modules.users.requests.BlacklistTokenRequest;
 import com.khangmoihocit.learn.modules.users.requests.LoginRequest;
+import com.khangmoihocit.learn.modules.users.requests.RefreshTokenRequest;
 import com.khangmoihocit.learn.modules.users.resources.LoginResource;
+import com.khangmoihocit.learn.modules.users.resources.TokenResource;
 import com.khangmoihocit.learn.modules.users.services.interfaces.BlacklistedTokenService;
 import com.khangmoihocit.learn.modules.users.services.interfaces.UserService;
 import com.khangmoihocit.learn.services.JwtService;
@@ -69,7 +72,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(){
+    public ResponseEntity<TokenResource> refreshToken(@Valid @RequestBody RefreshTokenRequest request){
         return null;
     }
 }

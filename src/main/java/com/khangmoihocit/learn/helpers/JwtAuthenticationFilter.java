@@ -125,7 +125,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.info("Xác thực tài khoản thành công (token hợp lệ): " + userDetails.getUsername());
 
             }
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response); //sau đó tiếp tục kiểm tra ở security config
         } catch (ServletException | IOException ex) {
             sendErrorResponse(response, request,
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR,

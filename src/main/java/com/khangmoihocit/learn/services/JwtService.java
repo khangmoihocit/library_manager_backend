@@ -1,7 +1,9 @@
 package com.khangmoihocit.learn.services;
 
 import com.khangmoihocit.learn.config.JwtConfig;
+import com.khangmoihocit.learn.modules.users.entities.RefreshToken;
 import com.khangmoihocit.learn.modules.users.repositories.BlacklistedTokenRepository;
+import com.khangmoihocit.learn.modules.users.repositories.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -25,6 +27,7 @@ public class JwtService {
 
     private final JwtConfig jwtConfig;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
@@ -142,6 +145,19 @@ public class JwtService {
     public boolean isIssuerToken(String token){
         String tokenIssuer = extractClaims(token, Claims::getIssuer);
         return tokenIssuer.equals(jwtConfig.getIssuer());
+    }
+
+    public boolean isRefreshTokenValid(String token){
+        try{
+            Jwts.parser()
+                    .verifyWith(getSignInKey())
+                    .build()
+                    .parseSignedClaims(token);
+            RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(token);
+
+        }catch (Exception ex){
+            return false;
+        }
     }
 
     // Lấy theo nhiều claim khác nhau
