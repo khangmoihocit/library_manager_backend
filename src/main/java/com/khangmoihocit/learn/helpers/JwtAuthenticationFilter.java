@@ -63,6 +63,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         //nếu hợp lệ trích xuất thông tin từ token rồi extract sang userdetail rồi lưu vào security context
         try {
             jwt = authHeader.substring(7);
+            if (jwtService.isTokenExpired(jwt)) {
+                sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
+                        "Xác thực không thành công",
+                        "token đã hết hạn");
+                return;
+            }
+
             if (!jwtService.isTokenFormatValid(jwt)) {
                 sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
                         "Xác thực không thành công",
@@ -81,13 +88,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
                         "Xác thực không thành công",
                         "token có nguồn gốc không hợp lệ");
-                return;
-            }
-
-            if (jwtService.isTokenExpired(jwt)) {
-                sendErrorResponse(response, request, HttpServletResponse.SC_UNAUTHORIZED,
-                        "Xác thực không thành công",
-                        "token đã hết hạn");
                 return;
             }
 
