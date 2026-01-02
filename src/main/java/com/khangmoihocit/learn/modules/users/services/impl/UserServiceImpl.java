@@ -40,6 +40,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             }
 
             String token = jwtService.generateToken(user.getId(), user.getEmail());
+            String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getEmail());
             UserResource userResource = UserResource.builder()
                     .id(user.getId())
                     .email(user.getEmail())
@@ -48,6 +49,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 
             return LoginResource.builder()
                     .token(token)
+                    .refreshToken(refreshToken)
                     .user(userResource)
                     .build();
 

@@ -8,8 +8,6 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LoginResource {
+public class TokenResource {
     String token;
-    String refreshToken;
-    UserResource user;
 }

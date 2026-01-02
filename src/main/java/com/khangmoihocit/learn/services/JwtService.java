@@ -1,7 +1,9 @@
 package com.khangmoihocit.learn.services;
 
 import com.khangmoihocit.learn.config.JwtConfig;
+import com.khangmoihocit.learn.modules.users.entities.RefreshToken;
 import com.khangmoihocit.learn.modules.users.repositories.BlacklistedTokenRepository;
+import com.khangmoihocit.learn.modules.users.repositories.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -15,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -25,6 +28,7 @@ public class JwtService {
 
     private final JwtConfig jwtConfig;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
@@ -33,8 +37,9 @@ public class JwtService {
 
     public String generateToken(Long userId, String email) {
         Date now = new Date();
+        log.info(String.valueOf(jwtConfig.getExpirationTime()));
         Date expiryDate = new Date(now.getTime() + jwtConfig.getExpirationTime());
-
+        log.info(expiryDate.toString());
         return Jwts.builder()
                 .subject(String.valueOf(userId))
                 .claim("email", email)
@@ -43,6 +48,27 @@ public class JwtService {
                 .expiration(expiryDate)
                 .signWith(getSignInKey(), Jwts.SIG.HS512)
                 .compact();
+    }
+
+    public String generateRefreshToken(Long userId, String email) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtConfig.getExpirationTimeRefreshToken());
+
+        String strRefreshToken = Jwts.builder()
+                .subject(String.valueOf(userId))
+                .claim("email", email)
+                .issuer(jwtConfig.getIssuer())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(getSignInKey(), Jwts.SIG.HS512)
+                .compact();
+        RefreshToken refreshToken = RefreshToken.builder()
+                .refreshToken(strRefreshToken)
+                .userId(userId)
+                .expiryDate(expiryDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                .build();
+        refreshTokenRepository.save(refreshToken);
+        return strRefreshToken;
     }
 
     public String extractUsername(String token) {
@@ -62,49 +88,6 @@ public class JwtService {
     5. kiểm tra xem token có trong blacklist không
     6. kiểm tra quyền
     */
-
-    public boolean isValidToken(String token, UserDetails userDetails){
-        try{
-            //1. kiem tra dinh dang
-            if(!isTokenFormatValid(token)){
-                log.error("token k dung dinh dang");
-                return false;
-            }
-
-            //2. kiem tra chu ky token
-            if(!isSignatureValid(token)){
-                log.error("chu ky khogn hop le");
-                return false;
-            }
-
-            //3. token het han chua
-            if(!isTokenExpired(token)){
-                log.error("token het han");
-                return false;
-            }
-
-            //4. kiem tra nguon goc cua token
-            if(!isIssuerToken(token)){
-                log.error("nguon goc token khong hop le");
-                return false;
-            }
-
-            //5. ktra xem userid trong token co khop voi userdetail khong
-            final String email = getEmailFromJwt(token);
-            if(!email.equals(userDetails.getUsername())){
-                log.error("user token khong hop le");
-                return false;
-            }
-
-            //6. ktra token co trong blacklist khong
-
-        }catch (Exception e){
-            log.error("xac thuc token that bai: " + e.getMessage());
-            return false;
-        }
-
-        return true;
-    }
 
     public boolean isBlacklistedToken(String token){
         return blacklistedTokenRepository.existsByToken(token);
@@ -142,6 +125,24 @@ public class JwtService {
     public boolean isIssuerToken(String token){
         String tokenIssuer = extractClaims(token, Claims::getIssuer);
         return tokenIssuer.equals(jwtConfig.getIssuer());
+    }
+
+    //true: token con han
+    //false: token het han han
+    public boolean isRefreshTokenValid(String token){
+        try{
+            Jwts.parser()
+                    .verifyWith(getSignInKey())
+                    .build()
+                    .parseSignedClaims(token);
+            RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(token)
+                    .orElseThrow(()-> new RuntimeException("refreshtoken không hợp lệ"));
+            final Date expire = extractAllClaims(refreshToken.getRefreshToken()).getExpiration();
+
+            return expire.before(new Date());
+        }catch (Exception ex){
+            return false;
+        }
     }
 
     // Lấy theo nhiều claim khác nhau
